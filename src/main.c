@@ -6,6 +6,9 @@ SDL_Window		*window = NULL;
 SDL_Renderer	*renderer = NULL;
 int				isGameRunning = FALSE;
 
+int				playerX;
+int				playerY;
+
 int	initializeWindow()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -47,16 +50,24 @@ void	destroyWindow()
 
 void	setup()
 {
-	// TODO:
-	// initalize and setup game objects
+	playerX = 0;
+	playerY = 0;
+}
+
+void	update()
+{
+	playerX += 1;
+	playerY += 1;
 }
 
 void	render()
 {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderClear(renderer);
 
-	// TODO:
-	// render all game objects for the current frame
+	SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+	SDL_Rect	rect = {playerX, playerY, 20, 20};
+	SDL_RenderFillRect(renderer, &rect);
 
 	SDL_RenderPresent(renderer);
 }
@@ -91,7 +102,7 @@ int	main()
 	while (isGameRunning)
 	{
 		processInput();
-		//update();
+		update();
 		render();
 	}
 
