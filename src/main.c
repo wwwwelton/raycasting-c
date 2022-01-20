@@ -30,7 +30,20 @@ struct	Player {
 	float	rotationAngle;
 	float	walkSpeed;
 	float	turnSpeed;
-}		player;
+}			player;
+
+struct	Ray {
+	float	rayAngle;
+	float	wallHitX;
+	float	wallHitY;
+	float	distance;
+	int		wasHitVertical;
+	int		isRayFacingUp;
+	int		isRayFacingDown;
+	int		isRayFacingLeft;
+	int		isRayFacingRight;
+	int		wallHitContent;
+}			rays[NUM_RAYS];
 
 SDL_Window		*window = NULL;
 SDL_Renderer	*renderer = NULL;
@@ -143,6 +156,25 @@ void	renderPlayer(void)
 	);
 }
 
+void	castRay(float rayAngle, int stripId)
+{
+	// TODO: All that crazy logic for horz, vert, ...
+	// ...
+}
+
+void	castAllRays(void)
+{
+	float	rayAngle;
+
+	// start first ray subtracting half of our FOV
+	rayAngle = player.rotationAngle - (FOV_ANGLE / 2);
+	for (int stripId = 0; stripId < NUM_RAYS; stripId++)
+	{
+		castRay(rayAngle, stripId);
+		rayAngle += FOV_ANGLE / NUM_RAYS;
+	}
+}
+
 void	renderMap(void)
 {
 	int	tileX;
@@ -231,6 +263,7 @@ void	update(void)
 	ticksLastFrame = SDL_GetTicks();
 
 	movePlayer(deltaTime);
+	castAllRays();
 }
 
 void	render(void)
