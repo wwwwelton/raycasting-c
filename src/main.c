@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <SDL2/SDL.h>
+#include <limits.h>
 #include <math.h>
+#include <SDL2/SDL.h>
 #include "constants.h"
 
 const int		map[MAP_NUM_ROWS][MAP_NUM_COLS] =
@@ -164,6 +165,11 @@ float	normalizeAngle(float angle)
 	return (angle);
 }
 
+int	distanceBetweenPoints(float x1, float y1, float x2, float y2)
+{
+	return ( sqrt( (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) ) );
+}
+
 void	castRay(float rayAngle, int stripId)
 {
 	int		isRayFacingDown;
@@ -184,6 +190,8 @@ void	castRay(float rayAngle, int stripId)
 
 	float	nextHorzTouchX;
 	float	nextHorzTouchY;
+
+	float	horzHitDistance;
 	// horz
 
 	// vert
@@ -194,6 +202,8 @@ void	castRay(float rayAngle, int stripId)
 
 	float	nextVertTouchX;
 	float	nextVertTouchY;
+
+	float	vertHitDistance;
 	// vert
 
 	float	xToCheck;
@@ -308,6 +318,37 @@ void	castRay(float rayAngle, int stripId)
 			nextVertTouchY += ystep;
 		}
 	}
+
+	// Calculate both horizontal and vertical hit distances
+	// and choose the smallest one
+	horzHitDistance = foundHorzWallHit
+	? distanceBetweenPoints(player.x, player.y, horzWallHitX, horzWallHitY)
+	: INT_MAX;
+	vertHitDistance = foundVertWallHit
+	? distanceBetweenPoints(player.x, player.y, horzWallHitX, horzWallHitY)
+	: INT_MAX;
+
+	if (vertHitDistance < horzHitDistance)
+	{
+		rays[stripId].distance = vertHitDistance;
+		rays[stripId].wallHitX = vertWallHitX;
+		rays[stripId].wallHitY = vertWallHitY;
+		rays[stripId].wallHitContent = vertWallContent;
+		rays[stripId].wasHitVertical = TRUE;
+	}
+	else
+	{
+		rays[stripId].distance = horzHitDistance;
+		rays[stripId].wallHitX = horzWallHitX;
+		rays[stripId].wallHitY = horzWallHitY;
+		rays[stripId].wallHitContent = horzWallContent;
+		rays[stripId].wasHitVertical = FALSE;
+	}
+	rays[stripId].rayAngle = rayAngle;
+	rays[stripId].isRayFacingDown = isRayFacingDown;
+	rays[stripId].isRayFacingUp = isRayFacingUp;
+	rays[stripId].isRayFacingLeft = isRayFacingLeft;
+	rays[stripId].isRayFacingRight = isRayFacingRight;
 }
 
 void	castAllRays(void)
