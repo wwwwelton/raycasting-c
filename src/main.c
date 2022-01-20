@@ -176,6 +176,7 @@ void	castRay(float rayAngle, int stripId)
 	float	xstep;
 	float	ystep;
 
+	// horz
 	int		foundHorzWallHit;
 	float	horzWallHitX;
 	float	horzWallHitY;
@@ -183,6 +184,17 @@ void	castRay(float rayAngle, int stripId)
 
 	float	nextHorzTouchX;
 	float	nextHorzTouchY;
+	// horz
+
+	// vert
+	int		foundVertWallHit;
+	float	vertWallHitX;
+	float	vertWallHitY;
+	int		vertWallContent;
+
+	float	nextVertTouchX;
+	float	nextVertTouchY;
+	// vert
 
 	float	xToCheck;
 	float	yToCheck;
@@ -243,6 +255,57 @@ void	castRay(float rayAngle, int stripId)
 		{
 			nextHorzTouchX += xstep;
 			nextHorzTouchY += ystep;
+		}
+	}
+
+	///////////////////////////////////////////
+	// VERTICAL RAY-GRID INTERSECTION CODE //
+	//////////////////////////////////////////
+	foundVertWallHit = FALSE;
+	vertWallHitX = 0;
+	vertWallHitY = 0;
+	vertWallContent = 0;
+
+	// Find the x-coordinate of the closest vertical grid intersection
+	xintercept = floor(player.x / TILE_SIZE) * TILE_SIZE;
+	xintercept += isRayFacingRight ? TILE_SIZE : 0;
+
+	// Find the y-coordinate of the closest vertical grid intersection
+	yintercept = player.y + (xintercept - player.x) / tan(rayAngle);
+
+	// Calculate the increment xtep e and ystep
+	xstep = TILE_SIZE;
+	xstep *= isRayFacingLeft ? -1 : 1;
+
+	ystep = TILE_SIZE / tan(rayAngle);
+	ystep *= (isRayFacingUp && xstep > 0) ? -1 : 1;
+	ystep *= (isRayFacingDown && xstep < 0) ? -1 : 1;
+
+	nextVertTouchX = xintercept;
+	nextVertTouchY = yintercept;
+
+	// Increment xstep and ystep until we find a wall
+	while (nextVertTouchX >= 0 && nextVertTouchX <= WINDOW_WIDTH
+		&& nextVertTouchY >= 0 && nextVertTouchY <= WINDOW_HEIGHT)
+	{
+		// Decreases one pixel to ensure the point is inside
+		// below the line and not on top
+		xToCheck = nextVertTouchX + (isRayFacingLeft ? -1 : 0);
+		yToCheck = nextVertTouchY;
+
+		if (mapHasWallAt(xToCheck, yToCheck))
+		{
+			// found a wall hit
+			vertWallHitX = nextVertTouchX;
+			vertWallHitY = nextVertTouchY;
+			vertWallContent = map[(int)floor(yToCheck / TILE_SIZE)][(int)floor(xToCheck / TILE_SIZE)];
+			foundVertWallHit = TRUE;
+			break ;
+		}
+		else
+		{
+			nextVertTouchX += xstep;
+			nextVertTouchY += ystep;
 		}
 	}
 }
