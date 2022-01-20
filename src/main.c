@@ -85,8 +85,21 @@ void	setup(void)
 	player.turnDirection = 0;
 	player.walkDirection = 0;
 	player.rotationAngle = PI / 2;
-	player.walkSpeed = 50;
+	player.walkSpeed = 200;
 	player.turnSpeed = 45 * (PI / 180);
+}
+
+int	mapHasWallAt(float x, float y)
+{
+	int	mapGridIndexX;
+	int	mapGridIndexY;
+
+	if (x < 0 || x > WINDOW_WIDTH || y < 0 || y > WINDOW_HEIGHT)
+		return (TRUE);
+
+	mapGridIndexX = (floor)(x / TILE_SIZE);
+	mapGridIndexY = (floor)(y / TILE_SIZE);
+	return (map[mapGridIndexY][mapGridIndexX] != 0);
 }
 
 void	movePlayer(float deltaTime)
@@ -101,10 +114,11 @@ void	movePlayer(float deltaTime)
 	newPlayerX = player.x + cos(player.rotationAngle) * moveStep;
 	newPlayerY = player.y + sin(player.rotationAngle) * moveStep;
 
-	// TODO:
-	// perform wall collision
-	player.x = newPlayerX;
-	player.y = newPlayerY;
+	if (!mapHasWallAt(newPlayerX, newPlayerY))
+	{
+		player.x = newPlayerX;
+		player.y = newPlayerY;
+	}
 }
 
 void	renderPlayer(void)
