@@ -156,10 +156,95 @@ void	renderPlayer(void)
 	);
 }
 
+float	normalizeAngle(float angle)
+{
+	angle = remainder(angle, TWO_PI);
+	if (angle < 0)
+		angle = TWO_PI + angle;
+	return (angle);
+}
+
 void	castRay(float rayAngle, int stripId)
 {
-	// TODO: All that crazy logic for horz, vert, ...
-	// ...
+	int		isRayFacingDown;
+	int		isRayFacingUp;
+	int		isRayFacingRight;
+	int		isRayFacingLeft;
+
+	float	xintercept;
+	float	yintercept;
+	float	xstep;
+	float	ystep;
+
+	int		foundHorzWallHit;
+	float	horzWallHitX;
+	float	horzWallHitY;
+	int		horzWallContent;
+
+	float	nextHorzTouchX;
+	float	nextHorzTouchY;
+
+	float	xToCheck;
+	float	yToCheck;
+
+	rayAngle = normalizeAngle(rayAngle);
+
+	isRayFacingDown = rayAngle > 0 && rayAngle < PI;
+	isRayFacingUp = !isRayFacingDown;
+
+	isRayFacingRight = rayAngle < 0.5 * PI || rayAngle > 1.5 * PI;
+	isRayFacingLeft = !isRayFacingRight;
+
+	///////////////////////////////////////////
+	// HORIZONTAL RAY-GRID INTERSECTION CODE //
+	//////////////////////////////////////////
+	foundHorzWallHit = FALSE;
+	horzWallHitX = 0;
+	horzWallHitY = 0;
+	horzWallContent = 0;
+
+	// Find the y-coordinate of the closest horizontal grid intersection
+	yintercept = floor(player.y / TILE_SIZE) * TILE_SIZE;
+	yintercept += isRayFacingDown ? TILE_SIZE : 0;
+
+	// Find the x-coordinate of the closest horizontal grid intersection
+	xintercept = player.x + (yintercept - player.y) / tan(rayAngle);
+
+	// Calculate the increment xtep e and ystep
+	ystep = TILE_SIZE;
+	ystep *= isRayFacingUp ? -1 : 1;
+
+	xstep = TILE_SIZE / tan(rayAngle);
+	xstep *= (isRayFacingLeft && xstep > 0) ? -1 : 1;
+	xstep *= (isRayFacingRight && xstep < 0) ? -1 : 1;
+
+	nextHorzTouchX = xintercept;
+	nextHorzTouchY = yintercept;
+
+	// Increment xstep and ystep until we find a wall
+	while (nextHorzTouchX >= 0 && nextHorzTouchX <= WINDOW_WIDTH
+		&& nextHorzTouchY >= 0 && nextHorzTouchY <= WINDOW_HEIGHT)
+	{
+		// Decreases one pixel to ensure the point is inside
+		// below the line and not on top
+		xToCheck = nextHorzTouchX;
+		yToCheck = nextHorzTouchY + (isRayFacingUp ? - 1 : 0);
+
+		if (mapHasWallAt(xToCheck, yToCheck))
+		{
+			// found a wall hit
+			horzWallHitX = nextHorzTouchX;
+			horzWallHitY = nextHorzTouchY;
+			horzWallContent = map[(int)floor(yToCheck / TILE_SIZE)][(int)floor(xToCheck / TILE_SIZE)];
+			foundHorzWallHit = TRUE;
+			break ;
+		}
+		else
+		{
+			nextHorzTouchX += xstep;
+			nextHorzTouchY += ystep;
+		}
+	}
 }
 
 void	castAllRays(void)
