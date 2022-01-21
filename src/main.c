@@ -55,6 +55,8 @@ Uint32			*colorBuffer = NULL;
 
 SDL_Texture		*colorBufferTexture;
 
+Uint32			*wallTexture = NULL;
+
 int	initializeWindow(void)
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -120,6 +122,16 @@ void	setup(void)
 		WINDOW_WIDTH,
 		WINDOW_HEIGHT
 	);
+
+	// create a texture with a pattern of blue and black lines
+	wallTexture = (Uint32 *)malloc(sizeof(Uint32) * (Uint32)TEXTURE_WIDTH * (Uint32)TEXTURE_HEIGHT);
+	for (int x = 0; x < TEXTURE_WIDTH; x++)
+	{
+		for (int y = 0; y < TEXTURE_HEIGHT; y++)
+		{
+			wallTexture[(TEXTURE_WIDTH * y) + x] = (x % 8 && y % 8) ? 0xFF0000FF : 0xFF000000;
+		}
+	}
 }
 
 int	mapHasWallAt(float x, float y)
