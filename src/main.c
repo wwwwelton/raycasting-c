@@ -51,6 +51,10 @@ SDL_Renderer	*renderer = NULL;
 int				isGameRunning = FALSE;
 int				ticksLastFrame;
 
+Uint32			*colorBuffer = NULL;
+
+SDL_Texture		*colorBufferTexture;
+
 int	initializeWindow(void)
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -85,6 +89,8 @@ int	initializeWindow(void)
 
 void	destroyWindow(void)
 {
+	free(colorBuffer);
+	SDL_DestroyTexture(colorBufferTexture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -101,6 +107,19 @@ void	setup(void)
 	player.rotationAngle = PI / 2;
 	player.walkSpeed = 200;
 	player.turnSpeed = 45 * (PI / 180);
+
+	// allocate the total amount of bytes in memory to hold our colorbuffer
+	colorBuffer = (Uint32 *)malloc(sizeof(Uint32) * (Uint32)WINDOW_WIDTH * (Uint32)WINDOW_HEIGHT);
+
+	// create an SDL_texture to display the colorbuffer
+	colorBufferTexture = SDL_CreateTexture
+	(
+		renderer,
+		SDL_PIXELFORMAT_ARGB8888,
+		SDL_TEXTUREACCESS_STREAMING,
+		WINDOW_WIDTH,
+		WINDOW_HEIGHT
+	);
 }
 
 int	mapHasWallAt(float x, float y)
@@ -323,10 +342,10 @@ void	castRay(float rayAngle, int stripId)
 	// and choose the smallest one
 	horzHitDistance = foundHorzWallHit
 	? distanceBetweenPoints(player.x, player.y, horzWallHitX, horzWallHitY)
-	: INT_MAX;
+	: FLT_MAX;
 	vertHitDistance = foundVertWallHit
 	? distanceBetweenPoints(player.x, player.y, vertWallHitX, vertWallHitY)
-	: INT_MAX;
+	: FLT_MAX;
 
 	if (vertHitDistance < horzHitDistance)
 	{
@@ -471,11 +490,42 @@ void	update(void)
 	castAllRays();
 }
 
+void	clearColorBuffer(Uint32 color)
+{
+	for (int x = 0; x < WINDOW_WIDTH; x++)
+	{
+		for (int y = 0; y < WINDOW_HEIGHT; y++)
+		{
+			if (x == y)
+				colorBuffer[(WINDOW_WIDTH * y) + x] = color;
+			else
+				colorBuffer[(WINDOW_WIDTH * y) + x] = 0xFFFF0000;
+		}
+	}
+}
+
+void	renderColorBuffer(void)
+{
+	SDL_UpdateTexture
+	(
+		colorBufferTexture,
+		NULL,
+		colorBuffer,
+		(int)((Uint32)WINDOW_WIDTH * sizeof(Uint32))
+	);
+	SDL_RenderCopy(renderer, colorBufferTexture, NULL, NULL);
+}
+
 void	render(void)
 {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 
+	renderColorBuffer();
+	// clear the color buffer
+	clearColorBuffer(0xFF00EE30);
+
+	// display the minimap
 	renderMap();
 	renderRays();
 	renderPlayer();
