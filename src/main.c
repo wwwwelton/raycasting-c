@@ -508,6 +508,8 @@ void	generate3DProjection(void)
 	int			textureOffsetY;
 	int			distanceFromTop;
 	int			texNum;
+	int			texture_width;
+	int			texture_height;
 
 	for (int i = 0; i < NUM_RAYS; i++)
 	{
@@ -542,15 +544,18 @@ void	generate3DProjection(void)
 		// get the correct texture id number from the map content
 		texNum = rays[i].wallHitContent - 1;
 
+		texture_width = wallTextures[texNum].width;
+		texture_height = wallTextures[texNum].height;
+
 		// render the wall from wallTopPixel to wallBottomPixel
 		for (int y = wallTopPixel; y < wallBottomPixel; y++)
 		{
 			// calculate textureOffsetY
 			distanceFromTop = y + (wallStripHeight / 2) - (WINDOW_HEIGHT / 2);
-			textureOffsetY = distanceFromTop * ((float)TEXTURE_HEIGHT / wallStripHeight);
+			textureOffsetY = distanceFromTop * ((float)texture_height / wallStripHeight);
 
 			//set the color of the wall based on the color from texture
-			texelColor = wallTextures[texNum].texture_buffer[(TEXTURE_WIDTH * textureOffsetY) + textureOffsetX];
+			texelColor = wallTextures[texNum].texture_buffer[(texture_width * textureOffsetY) + textureOffsetX];
 			colorBuffer[(WINDOW_WIDTH * y) + i] = texelColor;
 		}
 		// set the color of the flor
