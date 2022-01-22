@@ -510,6 +510,10 @@ void	generate3DProjection(void)
 	int		wallTopPixel;
 	int		wallBottomPixel;
 	float	perpDistance;
+	Uint32	texelColor;
+	int		textureOffsetX;
+	int		textureOffsetY;
+	int		distanceFromTop;
 
 	for (int i = 0; i < NUM_RAYS; i++)
 	{
@@ -529,10 +533,29 @@ void	generate3DProjection(void)
 		for (int y = 0; y < wallTopPixel; y++)
 			colorBuffer[(WINDOW_WIDTH * y) + i] = 0xFF333333;
 
+		// calculate textureOffsetX
+		if (rays[i].wasHitVertical)
+		{
+			// perform offset for the vertical hit
+			textureOffsetX = (int)rays[i].wallHitY % TILE_SIZE;
+		}
+		else
+		{
+			// perform offset for the horizontal hit
+			textureOffsetX = (int)rays[i].wallHitX % TILE_SIZE;
+		}
+
 		// render the wall from wallTopPixel to wallBottomPixel
 		for (int y = wallTopPixel; y < wallBottomPixel; y++)
-			colorBuffer[(WINDOW_WIDTH * y) + i] = rays[i].wasHitVertical ? 0xFFFFFFFF : 0xFFCCCCCC;
+		{
+			// calculate textureOffsetY
+			distanceFromTop = y + (wallStripHeight / 2) - (WINDOW_HEIGHT / 2);
+			textureOffsetY = distanceFromTop * ((float)TEXTURE_HEIGHT / wallStripHeight);
 
+			//set the color of the wall based on the color from texture
+			texelColor = wallTexture[(TEXTURE_WIDTH * textureOffsetY) + textureOffsetX];
+			colorBuffer[(WINDOW_WIDTH * y) + i] = texelColor;
+		}
 		// set the color of the flor
 		for (int y = wallBottomPixel; y < WINDOW_HEIGHT; y++)
 			colorBuffer[(WINDOW_WIDTH * y) + i] = 0xFF777777;
