@@ -3,9 +3,6 @@
 
 #include <math.h>
 
-#define FALSE 0
-#define TRUE 1
-
 #define PI 3.14159265
 #define TWO_PI 6.28318530
 
@@ -17,8 +14,8 @@
 
 #define MINIMAP_SCALE_FACTOR 0.2
 
-#define WINDOW_WIDTH (MAP_NUM_COLS * TILE_SIZE)
-#define WINDOW_HEIGHT (MAP_NUM_ROWS * TILE_SIZE)
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
 
 #define FOV_ANGLE (60 * (PI / 180))
 
