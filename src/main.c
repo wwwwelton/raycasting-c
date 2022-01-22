@@ -90,6 +90,7 @@ int	initializeWindow(void)
 
 void	destroyWindow(void)
 {
+	freeWallTextures();
 	free(colorBuffer);
 	SDL_DestroyTexture(colorBufferTexture);
 	SDL_DestroyRenderer(renderer);
@@ -116,21 +117,14 @@ void	setup(void)
 	colorBufferTexture = SDL_CreateTexture
 	(
 		renderer,
-		SDL_PIXELFORMAT_ARGB8888,
+		SDL_PIXELFORMAT_RGBA32,
 		SDL_TEXTUREACCESS_STREAMING,
 		WINDOW_WIDTH,
 		WINDOW_HEIGHT
 	);
 
-	// load some textures from the textures.h
-	textures[0] = (uint32_t *) REDBRICK_TEXTURE;
-	textures[1] = (uint32_t *) PURPLESTONE_TEXTURE;
-	textures[2] = (uint32_t *) MOSSYSTONE_TEXTURE;
-	textures[3] = (uint32_t *) GRAYSTONE_TEXTURE;
-	textures[4] = (uint32_t *) COLORSTONE_TEXTURE;
-	textures[5] = (uint32_t *) BLUESTONE_TEXTURE;
-	textures[6] = (uint32_t *) WOOD_TEXTURE;
-	textures[7] = (uint32_t *) EAGLE_TEXTURE;
+	// Asks uPNG library to decode all PNG files and loads the wallTextures array
+	loadWallTextures();
 }
 
 int	mapHasWallAt(float x, float y)
@@ -556,7 +550,7 @@ void	generate3DProjection(void)
 			textureOffsetY = distanceFromTop * ((float)TEXTURE_HEIGHT / wallStripHeight);
 
 			//set the color of the wall based on the color from texture
-			texelColor = textures[texNum][(TEXTURE_WIDTH * textureOffsetY) + textureOffsetX];
+			texelColor = wallTextures[texNum].texture_buffer[(TEXTURE_WIDTH * textureOffsetY) + textureOffsetX];
 			colorBuffer[(WINDOW_WIDTH * y) + i] = texelColor;
 		}
 		// set the color of the flor
