@@ -378,13 +378,16 @@ void	castRay(float rayAngle, int stripId)
 void	castAllRays(void)
 {
 	float	rayAngle;
+	float	distanceProjPlane;
 
-	// start first ray subtracting half of our FOV
-	rayAngle = player.rotationAngle - (FOV_ANGLE / 2);
-	for (int stripId = 0; stripId < NUM_RAYS; stripId++)
+	// calculate the distance of the player to the projection plane
+	distanceProjPlane = (WINDOW_WIDTH / 2) / tan(FOV_ANGLE / 2);
+	// loop all the pixels columns
+	for (int col = 0; col < NUM_RAYS; col++)
 	{
-		castRay(rayAngle, stripId);
-		rayAngle += FOV_ANGLE / NUM_RAYS;
+		// calculate the ray angle
+		rayAngle = player.rotationAngle + atan((col - NUM_RAYS / 2) / distanceProjPlane);
+		castRay(rayAngle, col);
 	}
 }
 
