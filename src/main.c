@@ -518,6 +518,8 @@ void	render(void)
 
 	renderWallProjection();
 
+	drawRect(100, 200, 500, 300, 0xFFFFFFFF);
+
 	// display the minimap
 	// renderMap();
 	// renderRays();
