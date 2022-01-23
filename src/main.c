@@ -6,23 +6,8 @@
 #include <SDL2/SDL.h>
 #include "defs.h"
 #include "graphics.h"
+#include "map.h"
 #include "textures.h"
-
-const int	map[MAP_NUM_ROWS][MAP_NUM_COLS] = {
-	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ,1, 1, 1, 1, 1, 1, 1},
-	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 1},
-	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-	{1, 0, 0, 0, 2, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 0, 0, 0, 0, 1},
-	{1, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-	{1, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 1},
-	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5},
-	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 5},
-	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 5},
-	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 5},
-	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 5, 5, 5, 5, 5}
-};
 
 struct	Player {
 	float	x;
@@ -62,19 +47,6 @@ void	setup(void)
 
 	// Asks uPNG library to decode all PNG files and loads the wallTextures array
 	loadWallTextures();
-}
-
-bool	mapHasWallAt(float x, float y)
-{
-	int	mapGridIndexX;
-	int	mapGridIndexY;
-
-	if (x < 0 || x >= MAP_NUM_COLS * TILE_SIZE || y < 0 || y >= MAP_NUM_ROWS * TILE_SIZE)
-		return (true);
-
-	mapGridIndexX = (floor)(x / TILE_SIZE);
-	mapGridIndexY = (floor)(y / TILE_SIZE);
-	return (map[mapGridIndexY][mapGridIndexX] != 0);
 }
 
 void	movePlayer(float deltaTime)
@@ -207,8 +179,9 @@ void	castRay(float rayAngle, int stripId)
 	nextHorzTouchY = yintercept;
 
 	// Increment xstep and ystep until we find a wall
-	while (nextHorzTouchX >= 0 && nextHorzTouchX <= MAP_NUM_COLS * TILE_SIZE
-		&& nextHorzTouchY >= 0 && nextHorzTouchY <= MAP_NUM_ROWS * TILE_SIZE)
+	// while (nextHorzTouchX >= 0 && nextHorzTouchX <= MAP_NUM_COLS * TILE_SIZE
+	// 	&& nextHorzTouchY >= 0 && nextHorzTouchY <= MAP_NUM_ROWS * TILE_SIZE)
+	while(isInsideMap(nextHorzTouchX, nextHorzTouchY))
 	{
 		// Decreases one pixel to ensure the point is inside
 		// below the line and not on top
@@ -220,7 +193,7 @@ void	castRay(float rayAngle, int stripId)
 			// found a wall hit
 			horzWallHitX = nextHorzTouchX;
 			horzWallHitY = nextHorzTouchY;
-			horzWallContent = map[(int)floor(yToCheck / TILE_SIZE)][(int)floor(xToCheck / TILE_SIZE)];
+			horzWallContent = getMapAt((int)floor(yToCheck / TILE_SIZE), (int)floor(xToCheck / TILE_SIZE));
 			foundHorzWallHit = true;
 			break ;
 		}
@@ -258,8 +231,9 @@ void	castRay(float rayAngle, int stripId)
 	nextVertTouchY = yintercept;
 
 	// Increment xstep and ystep until we find a wall
-	while (nextVertTouchX >= 0 && nextVertTouchX <= MAP_NUM_COLS * TILE_SIZE
-		&& nextVertTouchY >= 0 && nextVertTouchY <= MAP_NUM_ROWS * TILE_SIZE)
+	// while (nextVertTouchX >= 0 && nextVertTouchX <= MAP_NUM_COLS * TILE_SIZE
+	// 	&& nextVertTouchY >= 0 && nextVertTouchY <= MAP_NUM_ROWS * TILE_SIZE)
+	while(isInsideMap(nextVertTouchX, nextVertTouchY))
 	{
 		// Decreases one pixel to ensure the point is inside
 		// below the line and not on top
@@ -271,7 +245,7 @@ void	castRay(float rayAngle, int stripId)
 			// found a wall hit
 			vertWallHitX = nextVertTouchX;
 			vertWallHitY = nextVertTouchY;
-			vertWallContent = map[(int)floor(yToCheck / TILE_SIZE)][(int)floor(xToCheck / TILE_SIZE)];
+			vertWallContent = getMapAt((int)floor(yToCheck / TILE_SIZE), (int)floor(xToCheck / TILE_SIZE));
 			foundVertWallHit = true;
 			break ;
 		}
@@ -325,35 +299,6 @@ void	castAllRays(void)
 		rayAngle = player.rotationAngle + atan((col - NUM_RAYS / 2) / distanceProjPlane);
 		castRay(rayAngle, col);
 	}
-}
-
-void	renderMap(void)
-{
-	/*
-	int	tileX;
-	int	tileY;
-	int	tileColor;
-
-	for (int i = 0; i < MAP_NUM_ROWS; i++)
-	{
-		for (int j = 0; j < MAP_NUM_COLS; j++)
-		{
-			tileX = j * TILE_SIZE;
-			tileY = i * TILE_SIZE;
-			tileColor = map[i][j] != 0 ? 255 : 0;
-
-			SDL_SetRenderDrawColor(renderer, tileColor, tileColor, tileColor, 255);
-			SDL_Rect	mapTileRect =
-			{
-				tileX * MINIMAP_SCALE_FACTOR,
-				tileY * MINIMAP_SCALE_FACTOR,
-				TILE_SIZE * MINIMAP_SCALE_FACTOR,
-				TILE_SIZE * MINIMAP_SCALE_FACTOR
-			};
-			SDL_RenderFillRect(renderer, &mapTileRect);
-		}
-	}
-	*/
 }
 
 void	renderRays()
@@ -518,10 +463,8 @@ void	render(void)
 
 	renderWallProjection();
 
-	drawRect(100, 200, 500, 300, 0xFFFFFFFF);
-
 	// display the minimap
-	// renderMap();
+	renderMap();
 	// renderRays();
 	// renderPlayer();
 
