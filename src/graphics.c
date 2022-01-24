@@ -93,3 +93,40 @@ void	drawRect(int x, int y, int width, int height, uint32_t color)
 		}
 	}
 }
+
+void	drawLine(int x0, int y0, int x1, int y1, uint32_t color)
+{
+	int		deltaX;
+	int		deltaY;
+	int		longestSideLength;
+	float	xIncrement;
+	float	yIncrement;
+	float	currentX;
+	float	currentY;
+
+	// diferences between start and end of the line
+	deltaX = (x1 - x0);
+	deltaY = (y1 - y0);
+
+	// longest side of the line
+	longestSideLength = (abs(deltaX) >= abs(deltaY)) ? abs(deltaX) : abs(deltaY);
+
+	// find the increment values
+	xIncrement = deltaX / (float)longestSideLength;
+	yIncrement = deltaY / (float)longestSideLength;
+
+	// start point
+	currentX = x0;
+	currentY = y0;
+
+	// loop all the longest side until the end
+	for (int i = 0; i < longestSideLength; i++)
+	{
+		// draw pixel, rounding the values to integer to get nearest pixel
+		drawPixel(round(currentX), round(currentY), color);
+
+		// increment the slope to get the next pixel
+		currentX += xIncrement;
+		currentY += yIncrement;
+	}
+}
