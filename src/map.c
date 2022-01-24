@@ -40,7 +40,7 @@ int		getMapAt(int i, int j)
 	return (map[i][j]);
 }
 
-void	renderMap(void)
+void	renderMapGrid(void)
 {
 	int			tileX;
 	int			tileY;

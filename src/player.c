@@ -32,7 +32,7 @@ void	movePlayer(float deltaTime)
 	}
 }
 
-void	renderPlayer(void)
+void	renderMapPlayer(void)
 {
 	drawRect
 	(

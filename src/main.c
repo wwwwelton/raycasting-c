@@ -15,7 +15,7 @@ int		ticksLastFrame;
 void	setup(void)
 {
 	// Asks uPNG library to decode all PNG files and loads the wallTextures array
-	loadWallTextures();
+	loadTextures();
 }
 
 void	processInput(void)
@@ -89,19 +89,22 @@ void	render(void)
 	// clear the color buffer
 	clearColorBuffer(0xFF000000);
 
+	// Render the wall and sprites
 	renderWallProjection();
+	// renderSpriteProjection();
 
+	// Render the minimap objects
 	// display the minimap
-	renderMap();
-	renderRays();
-	renderPlayer();
+	renderMapGrid();
+	renderMapRays();
+	renderMapPlayer();
 
 	renderColorBuffer();
 }
 
 void	releaseResources(void)
 {
-	freeWallTextures();
+	freeTextures();
 	destroyWindow();
 }
 

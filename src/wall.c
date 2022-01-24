@@ -19,39 +19,44 @@ void	changeColorIntensity(color_t *color, float factor)
 void	renderWallProjection(void)
 {
 	float		distanceProjPlane;
-	float		projectedWallHeight;
-	int			wallStripHeight;
-	int			wallTopPixel;
-	int			wallBottomPixel;
+	float		wallHeight;
+	int			wallTopY;
+	int			wallBottomY;
 	float		perpDistance;
 	color_t		texelColor;
+	color_t		*wallTextureBuffer;
 	int			textureOffsetX;
 	int			textureOffsetY;
 	int			distanceFromTop;
 	int			texNum;
-	int			texture_width;
-	int			texture_height;
+	int			textureWidth;
+	int			textureHeight;
 
 	for (int x = 0; x < NUM_RAYS; x++)
 	{
-		perpDistance = rays[x].distance * cos(rays[x].rayAngle - player.rotationAngle);
+		// Calculate the projection plane distance
 		distanceProjPlane = (WINDOW_WIDTH / 2) / tan(FOV_ANGLE / 2);
-		projectedWallHeight = (TILE_SIZE / perpDistance) * distanceProjPlane;
 
-		wallStripHeight = (int)projectedWallHeight;
+		// Calculate the perpendicular distance to avoid the fish-eye distortion
+		perpDistance = rays[x].distance * cos(rays[x].rayAngle - player.rotationAngle);
 
-		wallTopPixel = (WINDOW_HEIGHT / 2) - (wallStripHeight / 2);
-		wallTopPixel = wallTopPixel < 0 ? 0 : wallTopPixel;
+		// Calculate the projected wall height
+		wallHeight = (TILE_SIZE / perpDistance) * distanceProjPlane;
 
-		wallBottomPixel = (WINDOW_HEIGHT / 2) + (wallStripHeight / 2);
-		wallBottomPixel = wallBottomPixel > WINDOW_HEIGHT ? WINDOW_HEIGHT : wallBottomPixel;
+		// Find the wall top Y value
+		wallTopY = (WINDOW_HEIGHT / 2) - (wallHeight / 2);
+		wallTopY = wallTopY < 0 ? 0 : wallTopY;
 
-		// set the color of the ceiling
-		for (int y = 0; y < wallTopPixel; y++)
+		// Find the wall bottom Y value
+		wallBottomY = (WINDOW_HEIGHT / 2) + (wallHeight / 2);
+		wallBottomY = wallBottomY > WINDOW_HEIGHT ? WINDOW_HEIGHT : wallBottomY;
+
+		// Draw the ceiling
+		for (int y = 0; y < wallTopY; y++)
 			// colorBuffer[(WINDOW_WIDTH * y) + x] = 0xFF444444;
 			drawPixel(x, y, 0xFF444444);
 
-		// calculate textureOffsetX
+		// Draw the textured wall
 		if (rays[x].wasHitVertical)
 		{
 			// perform offset for the vertical hit
@@ -63,23 +68,25 @@ void	renderWallProjection(void)
 			textureOffsetX = (int)rays[x].wallHitX % TILE_SIZE;
 		}
 
-		// get the correct texture id number from the map content
+		// Get the correct texture id number from the map content
 		texNum = rays[x].wallHitContent - 1;
 
-		texture_width = wallTextures[texNum].width;
-		texture_height = wallTextures[texNum].height;
+		// Query the texture width and height from the upng
+		textureWidth = upng_get_width(textures[texNum]);
+		textureHeight = upng_get_height(textures[texNum]);
 
-		// render the wall from wallTopPixel to wallBottomPixel
-		for (int y = wallTopPixel; y < wallBottomPixel; y++)
+		// Render the wall from wallTopY to wallBottomY
+		for (int y = wallTopY; y < wallBottomY; y++)
 		{
 			// calculate textureOffsetY
-			distanceFromTop = y + (wallStripHeight / 2) - (WINDOW_HEIGHT / 2);
-			textureOffsetY = distanceFromTop * ((float)texture_height / wallStripHeight);
+			distanceFromTop = y + (wallHeight / 2) - (WINDOW_HEIGHT / 2);
+			textureOffsetY = distanceFromTop * ((float)textureHeight / wallHeight);
 
-			// set the color of the wall based on the color from the texture
-			texelColor = wallTextures[texNum].texture_buffer[(texture_width * textureOffsetY) + textureOffsetX];
+			// Set the color of the wall based on the color from the texture
+			wallTextureBuffer = (color_t *)upng_get_buffer(textures[texNum]);
+			texelColor = wallTextureBuffer[(textureWidth * textureOffsetY) + textureOffsetX];
 
-			// Make the pixel color darker if the ray was vertical
+			// Make the pixel color darker if the ray hit was vertical
 			if (rays[x].wasHitVertical)
 			{
 				changeColorIntensity(&texelColor, 0.7);
@@ -88,8 +95,8 @@ void	renderWallProjection(void)
 			// colorBuffer[(WINDOW_WIDTH * y) + x] = texelColor;
 			drawPixel(x, y, texelColor);
 		}
-		// set the color of the flor
-		for (int y = wallBottomPixel; y < WINDOW_HEIGHT; y++)
+		// Draw the floor
+		for (int y = wallBottomY; y < WINDOW_HEIGHT; y++)
 			// colorBuffer[(WINDOW_WIDTH * y) + x] = 0xFF777777;
 			drawPixel(x, y, 0xFF777777);
 	}

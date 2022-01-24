@@ -220,7 +220,7 @@ void	castAllRays(void)
 	}
 }
 
-void	renderRays(void)
+void	renderMapRays(void)
 {
 	// increment by 50, to draw only a few rays on the minimap
 	for (int i = 0; i < NUM_RAYS; i += 50)
