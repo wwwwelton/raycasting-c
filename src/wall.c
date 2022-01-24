@@ -1,5 +1,21 @@
 #include "wall.h"
 
+// Change the color intensity based on factor value between 0 and 1
+void	changeColorIntensity(color_t *color, float factor)
+{
+	color_t	a;
+	color_t	r;
+	color_t	g;
+	color_t	b;
+
+	a = (*color & 0xFF000000);
+	r = (*color & 0x00FF0000) * factor;
+	g = (*color & 0x0000FF00) * factor;
+	b = (*color & 0x000000FF) * factor;
+
+	*color = a | (r & 0x00FF0000) | (g & 0x0000FF00) | (b & 0x000000FF);
+}
+
 void	renderWallProjection(void)
 {
 	float		distanceProjPlane;
@@ -8,7 +24,7 @@ void	renderWallProjection(void)
 	int			wallTopPixel;
 	int			wallBottomPixel;
 	float		perpDistance;
-	uint32_t	texelColor;
+	color_t		texelColor;
 	int			textureOffsetX;
 	int			textureOffsetY;
 	int			distanceFromTop;
@@ -60,8 +76,15 @@ void	renderWallProjection(void)
 			distanceFromTop = y + (wallStripHeight / 2) - (WINDOW_HEIGHT / 2);
 			textureOffsetY = distanceFromTop * ((float)texture_height / wallStripHeight);
 
-			//set the color of the wall based on the color from texture
+			// set the color of the wall based on the color from the texture
 			texelColor = wallTextures[texNum].texture_buffer[(texture_width * textureOffsetY) + textureOffsetX];
+
+			// Make the pixel color darker if the ray was vertical
+			if (rays[x].wasHitVertical)
+			{
+				changeColorIntensity(&texelColor, 0.7);
+			}
+
 			// colorBuffer[(WINDOW_WIDTH * y) + x] = texelColor;
 			drawPixel(x, y, texelColor);
 		}

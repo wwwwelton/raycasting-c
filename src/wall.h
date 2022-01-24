@@ -9,5 +9,6 @@
 #include "textures.h"
 
 void	renderWallProjection(void);
+void	changeColorIntensity(color_t *color, float factor);
 
 #endif
