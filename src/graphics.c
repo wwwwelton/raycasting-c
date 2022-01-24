@@ -59,7 +59,7 @@ void	destroyWindow(void)
 	SDL_Quit();
 }
 
-void	clearColorBuffer(uint32_t color)
+void	clearColorBuffer(color_t color)
 {
 	for (int i = 0; i < WINDOW_WIDTH * WINDOW_HEIGHT; i++)
 		colorBuffer[i] = color;
@@ -72,18 +72,18 @@ void	renderColorBuffer(void)
 		colorBufferTexture,
 		NULL,
 		colorBuffer,
-		(int)((uint32_t)WINDOW_WIDTH * sizeof(uint32_t))
+		(int)((uint32_t)WINDOW_WIDTH * sizeof(color_t))
 	);
 	SDL_RenderCopy(renderer, colorBufferTexture, NULL, NULL);
 	SDL_RenderPresent(renderer);
 }
 
-void	drawPixel(int x, int y, uint32_t color)
+void	drawPixel(int x, int y, color_t color)
 {
 	colorBuffer[(WINDOW_WIDTH * y) + x] = color;
 }
 
-void	drawRect(int x, int y, int width, int height, uint32_t color)
+void	drawRect(int x, int y, int width, int height, color_t color)
 {
 	for (int i = x; i <= (x + width); i++)
 	{
@@ -94,7 +94,7 @@ void	drawRect(int x, int y, int width, int height, uint32_t color)
 	}
 }
 
-void	drawLine(int x0, int y0, int x1, int y1, uint32_t color)
+void	drawLine(int x0, int y0, int x1, int y1, color_t color)
 {
 	int		deltaX;
 	int		deltaY;
