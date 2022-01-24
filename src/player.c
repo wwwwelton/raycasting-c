@@ -1,4 +1,5 @@
 #include "player.h"
+#include "utils.h"
 
 player_t	player =
 {
@@ -20,6 +21,8 @@ void	movePlayer(float deltaTime)
 	float	newPlayerY;
 
 	player.rotationAngle += player.turnDirection * player.turnSpeed * deltaTime;
+	normalizeAngle(&player.rotationAngle);
+
 	moveStep = player.walkDirection * player.walkSpeed * deltaTime;
 
 	newPlayerX = player.x + cos(player.rotationAngle) * moveStep;
