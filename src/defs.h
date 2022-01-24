@@ -2,6 +2,7 @@
 #define CONSTANTS_H
 
 #include <math.h>
+#include <SDL2/SDL.h>
 
 #define PI 3.14159265
 #define TWO_PI 6.28318530

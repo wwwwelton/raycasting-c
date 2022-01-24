@@ -2,6 +2,7 @@
 #define RAY_H
 
 #include <stdbool.h>
+#include <limits.h>
 #include "defs.h"
 #include "player.h"
 
