@@ -17,7 +17,7 @@ typedef struct	{
 
 extern ray_t	rays[NUM_RAYS];
 
-float	normalizeAngle(float angle);
+void	normalizeAngle(float *angle);
 int		distanceBetweenPoints(float x1, float y1, float x2, float y2);
 void	castAllRays(void);
 void	castRay(float rayAngle, int stripId);
