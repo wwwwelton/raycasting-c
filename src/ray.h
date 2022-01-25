@@ -17,8 +17,6 @@ typedef struct	{
 
 extern ray_t	rays[NUM_RAYS];
 
-void	normalizeAngle(float *angle);
-int		distanceBetweenPoints(float x1, float y1, float x2, float y2);
 bool	isRayFacingUp(float angle);
 bool	isRayFacingDown(float angle);
 bool	isRayFacingLeft(float angle);

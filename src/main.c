@@ -7,6 +7,7 @@
 #include "player.h"
 #include "ray.h"
 #include "wall.h"
+#include "sprite.h"
 #include "textures.h"
 
 bool	isGameRunning = false;
@@ -91,12 +92,13 @@ void	render(void)
 
 	// Render the wall and sprites
 	renderWallProjection();
-	// renderSpriteProjection();
+	renderSpriteProjection();
 
 	// Render the minimap objects
 	// display the minimap
 	renderMapGrid();
 	renderMapRays();
+	renderMapSprites();
 	renderMapPlayer();
 
 	renderColorBuffer();
