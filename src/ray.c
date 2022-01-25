@@ -35,7 +35,7 @@ void	castRay(float rayAngle, int stripId)
 	bool	foundHorzWallHit;
 	float	horzWallHitX;
 	float	horzWallHitY;
-	int		horzWallContent;
+	int		horzWallTexture;
 
 	float	nextHorzTouchX;
 	float	nextHorzTouchY;
@@ -47,7 +47,7 @@ void	castRay(float rayAngle, int stripId)
 	bool	foundVertWallHit;
 	float	vertWallHitX;
 	float	vertWallHitY;
-	int		vertWallContent;
+	int		vertWallTexture;
 
 	float	nextVertTouchX;
 	float	nextVertTouchY;
@@ -66,7 +66,7 @@ void	castRay(float rayAngle, int stripId)
 	foundHorzWallHit = false;
 	horzWallHitX = 0;
 	horzWallHitY = 0;
-	horzWallContent = 0;
+	horzWallTexture = 0;
 
 	// Find the y-coordinate of the closest horizontal grid intersection
 	yintercept = floor(player.y / TILE_SIZE) * TILE_SIZE;
@@ -101,7 +101,7 @@ void	castRay(float rayAngle, int stripId)
 			// found a wall hit
 			horzWallHitX = nextHorzTouchX;
 			horzWallHitY = nextHorzTouchY;
-			horzWallContent = getMapAt((int)floor(yToCheck / TILE_SIZE), (int)floor(xToCheck / TILE_SIZE));
+			horzWallTexture = getMapAt((int)floor(yToCheck / TILE_SIZE), (int)floor(xToCheck / TILE_SIZE));
 			foundHorzWallHit = true;
 			break ;
 		}
@@ -118,7 +118,7 @@ void	castRay(float rayAngle, int stripId)
 	foundVertWallHit = false;
 	vertWallHitX = 0;
 	vertWallHitY = 0;
-	vertWallContent = 0;
+	vertWallTexture = 0;
 
 	// Find the x-coordinate of the closest vertical grid intersection
 	xintercept = floor(player.x / TILE_SIZE) * TILE_SIZE;
@@ -153,7 +153,7 @@ void	castRay(float rayAngle, int stripId)
 			// found a wall hit
 			vertWallHitX = nextVertTouchX;
 			vertWallHitY = nextVertTouchY;
-			vertWallContent = getMapAt((int)floor(yToCheck / TILE_SIZE), (int)floor(xToCheck / TILE_SIZE));
+			vertWallTexture = getMapAt((int)floor(yToCheck / TILE_SIZE), (int)floor(xToCheck / TILE_SIZE));
 			foundVertWallHit = true;
 			break ;
 		}
@@ -178,7 +178,7 @@ void	castRay(float rayAngle, int stripId)
 		rays[stripId].distance = vertHitDistance;
 		rays[stripId].wallHitX = vertWallHitX;
 		rays[stripId].wallHitY = vertWallHitY;
-		rays[stripId].wallHitContent = vertWallContent;
+		rays[stripId].texture = vertWallTexture;
 		rays[stripId].wasHitVertical = true;
 		rays[stripId].rayAngle = rayAngle;
 	}
@@ -187,7 +187,7 @@ void	castRay(float rayAngle, int stripId)
 		rays[stripId].distance = horzHitDistance;
 		rays[stripId].wallHitX = horzWallHitX;
 		rays[stripId].wallHitY = horzWallHitY;
-		rays[stripId].wallHitContent = horzWallContent;
+		rays[stripId].texture = horzWallTexture;
 		rays[stripId].wasHitVertical = false;
 		rays[stripId].rayAngle = rayAngle;
 	}

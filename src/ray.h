@@ -12,7 +12,7 @@ typedef struct	{
 	float	wallHitY;
 	float	distance;
 	bool	wasHitVertical;
-	int		wallHitContent;
+	int		texture;
 }			ray_t;
 
 extern ray_t	rays[NUM_RAYS];
